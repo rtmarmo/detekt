@@ -48,3 +48,8 @@ Performance is the main issue with Detekt, and it will need to be improved.
 Some Yara signatures need to be improved, as currently some of them are not able to detect all existing variants of the respective malware families.
 
 Windows 8.1 64bit is currently not supported because the tool appears to be unable to complete the execution and just goes on forever. This issue needs to be investigated and resolved as soon as possible.
+
+Signature
+---------
+
+The distributed binary is signed with my personal PGP key, the public key is available at https://nex.sx/nex.asc
