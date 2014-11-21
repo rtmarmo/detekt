@@ -35,6 +35,15 @@ log.addHandler(fh)
 log.addHandler(sh)
 log.setLevel(logging.DEBUG)
 
+filter_processes = [
+    'avp.exe',
+    'avguard.exe',
+    'avira.oe.systr',
+    'savservice.exe',
+    'sbamsvc.exe',
+    'housecall.bin'
+]
+
 def get_address_space(service_path, profile, yara_path):
     log.info("Obtaining address space and generating config for volatility")
 
@@ -86,6 +95,11 @@ def scan(service_path, profile_name, queue_results):
 
             # Skip also if it's a child process.
             if int(o.InheritedFromUniqueProcessId) == int(os.getpid()):
+                continue
+
+            # Check for known processes triggering false positives.
+            # TODO: this is a hacky solution, need to harden signatures to prevent this.
+            if str(o.ImageFileName.lower()) in filter_processes:
                 continue
 
             owner = 'Process {0} (pid: {1})'.format(o.ImageFileName, o.UniqueProcessId)

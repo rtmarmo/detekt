@@ -27,8 +27,8 @@ rule FinSpy
         $screenrec6 = /(v)112Q00000000\.dat/ wide ascii
         $screenrec7 = /(v)112O00000000\.dat/ wide ascii
 
-        $keylogger1 = /\<%s UTC %s\|%d\|%s\>/ wide ascii
-        $keylogger2 = /1201[0-9A-F]{8}\.dat/ wide ascii
+        //$keylogger1 = /\<%s UTC %s\|%d\|%s\>/ wide ascii
+        //$keylogger2 = /1201[0-9A-F]{8}\.dat/ wide ascii
 
         $micrec = /2101[0-9A-F]{8}\.dat/ wide ascii
 
