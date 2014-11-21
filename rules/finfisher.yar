@@ -44,8 +44,8 @@ rule FinSpy
         $janedow1 = /(J)ane Dow\'s x32 machine/ wide ascii
         $janedow2 = /(J)ane Dow\'s x64 machine/ wide ascii
 
-        $versions1 = /(f)inspyv2/ nocase
-        $versions2 = /(f)inspyv4/ nocase
+        //$versions1 = /(f)inspyv2/ nocase
+        //$versions2 = /(f)inspyv4/ nocase
 
         $bootkit1 = /(b)ootkit_x32driver/
         $bootkit2 = /(b)ootkit_x64driver/
@@ -55,5 +55,5 @@ rule FinSpy
         $mssounddx = /(S)ystem\\CurrentControlSet\\Services\\mssounddx/ wide
 
     condition:
-        8 of ($password*) or any of ($screenrec*) or $micrec or any of ($skyperec*) or any of ($mouserec*) or $driver or any of ($janedow*) or any of ($versions*) or any of ($bootkit*) or $typo1 or $mssounddx
+        8 of ($password*) or any of ($screenrec*) or $micrec or any of ($skyperec*) or any of ($mouserec*) or $driver or any of ($janedow*) or any of ($bootkit*) or $typo1 or $mssounddx
 }
