@@ -4,24 +4,15 @@
 
 import os
 import time
+import yara
+import psutil
 import logging
 import threading
-import volatility.conf as conf
-import volatility.registry as registry
-import volatility.commands as commands
-import volatility.addrspace as addrspace
-import volatility.utils as utils
-import volatility.plugins.malware.malfind as malfind
 from win32com.shell import shell
 
-from abstracts import DetectorError
-from config import Config
-from service import Service, destroy
 from utils import get_resource
 
-# Reduce noise from Volatility.
-logging.getLogger('volatility.obj').setLevel(logging.ERROR)
-logging.getLogger('volatility.utils').setLevel(logging.ERROR)
+class DetectorError(Exception): pass
 
 # Configure logging for our main application.
 log = logging.getLogger('detector')
@@ -35,32 +26,18 @@ log.addHandler(fh)
 log.addHandler(sh)
 log.setLevel(logging.DEBUG)
 
-filter_processes = [
+process_whitelist = [
     'avp.exe',
     'avguard.exe',
     'avira.oe.systr',
     'savservice.exe',
     'sbamsvc.exe',
-    'housecall.bin'
+    'housecall.bin',
+    'avastui.exe',
+    'dphostw.exe',
 ]
 
-def get_address_space(service_path, profile, yara_path):
-    log.info("Obtaining address space and generating config for volatility")
-
-    registry.PluginImporter()
-    config = conf.ConfObject()
-
-    registry.register_global_options(config, commands.Command)
-    registry.register_global_options(config, addrspace.BaseAddressSpace)
-
-    config.parse_options()
-    config.PROFILE = profile
-    config.LOCATION = service_path
-    config.YARA_FILE = yara_path
-
-    return utils.load_as(config)
-
-def scan(service_path, profile_name, queue_results):
+def scan(queue_results):
     # Find Yara signatures, if file is not available, we need to terminate.
     yara_path = os.path.join(os.getcwd(), 'signatures.yar')
     if not os.path.exists(yara_path):
@@ -70,59 +47,54 @@ def scan(service_path, profile_name, queue_results):
 
     log.info("Selected Yara signature file at %s", yara_path)
 
-    # Retrieve adress space.
-    space = get_address_space(service_path, profile_name, yara_path)
-    if space == None:
-        log.info("Cannot generate address space")
-    else:
-        log.info("Address space: {0}, Base: {1}".format(space, space.base))
-        log.info("Profile: {0}, DTB: {1:#x}".format(space.profile, space.dtb))
-
-    # Initialize Volatility's YaraScan module.
-    yara = malfind.YaraScan(space.get_config())
-
-    log.info("Starting yara scanner...")
+    rules = yara.compile(yara_path)
 
     matched = []
-    for o, address, hit, value in yara.calculate():
-        if not o:
-            owner = 'Unknown Kernel Memory'
-        elif o.obj_name == '_EPROCESS':
-            # If the PID is of the current process, it's a false positive.
-            # It just detected the Yara signatures in memory. Skip.
-            if int(o.UniqueProcessId) == int(os.getpid()):
+
+    for process in psutil.process_iter():
+        # Skip ourselves.
+        if process.pid == os.getpid():
+            continue
+
+        try:
+            process_name = process.name()
+        except:
+            process_name = ''
+
+        # If there is a process name, let's match it against the whitelist
+        # and skip if there is a match.
+        # TODO: this is hacky, need to find a better solution to false positives
+        # especially with security software.
+        if process_name:
+            if process_name.lower() in process_whitelist:
                 continue
 
-            # Skip also if it's a child process.
-            if int(o.InheritedFromUniqueProcessId) == int(os.getpid()):
-                continue
+        try:
+            try:
+                log.debug("Scanning process %s, pid: %d, ppid: %d, exe: %s, cmdline: %s",
+                          process_name, process.pid, process.ppid(), process.exe(), process.cmdline())
+            except:
+                log.debug("Scanning process %s, pid: %d", process_name, process.pid)
 
-            # Check for known processes triggering false positives.
-            # TODO: this is a hacky solution, need to harden signatures to prevent this.
-            if str(o.ImageFileName.lower()) in filter_processes:
-                continue
+            for hit in rules.match(pid=process.pid):
+                log.warning("Process %s (pid: %d) matched: %s, Values:", process_name, process.pid, hit.rule)
 
-            owner = 'Process {0} (pid: {1})'.format(o.ImageFileName, o.UniqueProcessId)
-        else:
-            owner = '{0}'.format(o.BaseDllName)
+                for entry in hit.strings:
+                    log.warning("\t%d, %s, %s", entry[0], entry[1], entry[2])
 
-        # Extract hexdump of the memory chunk that matched the signature.
-        rule_data = ''
-        for offset, hexdata, translated_data in utils.Hexdump(value):
-            rule_data += '{0} {1}\n'.format(hexdata, ''.join(translated_data))
+                # We only store unique results, it's pointless to store results
+                # for the same rule.
+                if not hit.rule in matched:
+                    # Add rule to the list of unique matches.
+                    matched.append(hit.rule)
 
-        log.warning("%s matched: %s at address: 0x%X, Value:\n\n%s",
-                    owner, hit.rule, address, rule_data)
-
-        if not hit.rule in matched:
-            # Add the rule to the list of matched rules, so we don't have
-            # useless repetitions.
-            matched.append(hit.rule)
-
-            queue_results.put(dict(
-                rule=hit.rule,
-                detection=hit.meta.get('detection')
-            ))
+                    # Add match to the list of results.
+                    queue_results.put(dict(
+                        rule=hit.rule,
+                        detection=hit.meta.get('detection'),
+                    ))
+        except Exception as e:
+            log.debug("Unable to scan process: %s", e)
 
 def main(queue_results, queue_errors):
     log.info("Starting with process ID %d", os.getpid())
@@ -134,65 +106,14 @@ def main(queue_results, queue_errors):
         queue_errors.put('NOT_AN_ADMIN')
         return
 
-    # Generate configuration values.
-    cfg = Config()
-
-    # Check if this is a supported version of Windows and if so, obtain the
-    # volatility profile name.
-    cfg.get_profile_name()
-    if not cfg.profile:
-        log.error("Unsupported version of Windows, can't select a profile")
-        queue_errors.put('UNSUPPORTED_WINDOWS')
-        return
-
-    log.info("Selected Profile Name: {0}".format(cfg.profile))
-
-    # Obtain the path to the driver to load. At this point, this check should
-    # not fail, but you never know.
-    if not cfg.get_driver_path():
-        log.error("Unable to find a proper winpmem driver")
-        queue_errors.put('NO_DRIVER')
-        return
-
-    log.info("Selected Driver: {0}".format(cfg.driver))
-
-    # This is the ugliest black magic ever, but somehow helps.
-    # Just tries to brutally destroy the winpmem service if there is one
-    # lying around before trying to launch a new one again.
-    destroyer = threading.Thread(target=destroy, args=(cfg.driver, cfg.service_name))
-    destroyer.start()
-    destroyer.join()
-
-    # Initialize the winpmem service.
-    try:
-        service = Service(driver=cfg.driver, service=cfg.service_name)
-        service.create()
-        service.start()
-    except DetectorError as e:
-        log.critical("Unable to start winpmem service: %s", e)
-        queue_errors.put('SERVICE_NO_START')
-        return
-    else:
-        log.info("Service started")
-
     # Launch the scanner.
     try:
-        scan(cfg.service_path, cfg.profile, queue_results)
+        scan(queue_results)
     except DetectorError as e:
         log.critical("Yara scanning failed: %s", e)
         queue_errors.put('SCAN_FAILED')
     else:
         log.info("Scanning finished")
-
-    # Stop the winpmem service and unload the driver. At this point we should
-    # have cleaned up everything left on the system.
-    try:
-        service.stop()
-        service.delete()
-    except DetectorError as e:
-        log.error("Unable to stop winpmem service: %s", e)
-    else:
-        log.info("Service stopped")
 
     log.info("Analysis finished")
 
