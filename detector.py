@@ -6,12 +6,13 @@ import os
 import time
 import logging
 import threading
+import yara
 import volatility.conf as conf
 import volatility.registry as registry
 import volatility.commands as commands
 import volatility.addrspace as addrspace
 import volatility.utils as utils
-import volatility.plugins.malware.malfind as malfind
+import volatility.win32.tasks as tasks
 from win32com.shell import shell
 
 from abstracts import DetectorError
@@ -35,13 +36,16 @@ log.addHandler(fh)
 log.addHandler(sh)
 log.setLevel(logging.DEBUG)
 
-filter_processes = [
+process_whitelist = [
     'avp.exe',
     'avguard.exe',
     'avira.oe.systr',
     'savservice.exe',
     'sbamsvc.exe',
-    'housecall.bin'
+    'housecall.bin',
+    'avastui.exe',
+    'dphostw.exe',
+    'ekrn.exe',
 ]
 
 def get_address_space(service_path, profile, yara_path):
@@ -78,51 +82,56 @@ def scan(service_path, profile_name, queue_results):
         log.info("Address space: {0}, Base: {1}".format(space, space.base))
         log.info("Profile: {0}, DTB: {1:#x}".format(space.profile, space.dtb))
 
-    # Initialize Volatility's YaraScan module.
-    yara = malfind.YaraScan(space.get_config())
+    rules = yara.compile(yara_path)
 
     log.info("Starting yara scanner...")
 
     matched = []
-    for o, address, hit, value in yara.calculate():
-        if not o:
-            owner = 'Unknown Kernel Memory'
-        elif o.obj_name == '_EPROCESS':
-            # If the PID is of the current process, it's a false positive.
-            # It just detected the Yara signatures in memory. Skip.
-            if int(o.UniqueProcessId) == int(os.getpid()):
+
+    for process in tasks.pslist(space):
+        # Skip ourselves.
+        if process.UniqueProcessId == os.getpid():
+            continue
+
+        try:
+            process_name = process.ImageFileName
+        except:
+            process_name = ''
+
+        # If there is a process name, let's match it against the whitelist
+        # and skip if there is a match.
+        # TODO: this is hacky, need to find a better solution to false positives
+        # especially with security software.
+        if process_name:
+            if process_name.lower() in process_whitelist:
                 continue
 
-            # Skip also if it's a child process.
-            if int(o.InheritedFromUniqueProcessId) == int(os.getpid()):
-                continue
+        try:
+            try:
+                log.debug("Scanning process %s, pid: %d, ppid: %d, exe: %s, cmdline: %s",
+                          process_name, process.UniqueProcessId, process.InheritedFromUniqueProcessId, process.ImagePathName, process.CommandLine)
+            except:
+                log.debug("Scanning process %s, pid: %d", process_name, process.UniqueProcessId)
 
-            # Check for known processes triggering false positives.
-            # TODO: this is a hacky solution, need to harden signatures to prevent this.
-            if str(o.ImageFileName.lower()) in filter_processes:
-                continue
+            for hit in rules.match(pid=process.UniqueProcessId):
+                log.warning("Process %s (pid: %d) matched: %s, Values:", process_name, process.UniqueProcessId, hit.rule)
 
-            owner = 'Process {0} (pid: {1})'.format(o.ImageFileName, o.UniqueProcessId)
-        else:
-            owner = '{0}'.format(o.BaseDllName)
+                for entry in hit.strings:
+                    log.warning("\t%d, %s, %s", entry[0], entry[1], entry[2])
 
-        # Extract hexdump of the memory chunk that matched the signature.
-        rule_data = ''
-        for offset, hexdata, translated_data in utils.Hexdump(value):
-            rule_data += '{0} {1}\n'.format(hexdata, ''.join(translated_data))
+                # We only store unique results, it's pointless to store results
+                # for the same rule.
+                if not hit.rule in matched:
+                    # Add rule to the list of unique matches.
+                    matched.append(hit.rule)
 
-        log.warning("%s matched: %s at address: 0x%X, Value:\n\n%s",
-                    owner, hit.rule, address, rule_data)
-
-        if not hit.rule in matched:
-            # Add the rule to the list of matched rules, so we don't have
-            # useless repetitions.
-            matched.append(hit.rule)
-
-            queue_results.put(dict(
-                rule=hit.rule,
-                detection=hit.meta.get('detection')
-            ))
+                    # Add match to the list of results.
+                    queue_results.put(dict(
+                        rule=hit.rule,
+                        detection=hit.meta.get('detection'),
+                    ))
+        except Exception as e:
+            log.debug("Unable to scan process: %s", e)
 
 def main(queue_results, queue_errors):
     log.info("Starting with process ID %d", os.getpid())

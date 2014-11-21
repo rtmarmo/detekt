@@ -90,7 +90,6 @@ class Config(object):
             # correctly, so we need to invoke Windows native RtlGetVersion function.
             # If it's 6.3.x, it's Windows 8.1.
             if windows_major == 6 and windows_minor == 3:
-                # Enable only on Windows 8.1 32bit, on 64bit we have some problems.
                 if self.architecture == 'x86':
                     self.profile = 'Win8SP1{0}'.format(self.architecture)
             else:
