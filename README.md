@@ -1,7 +1,7 @@
 Detekt
 ======
 
-Detekt is a Python tool that relies on Yara, Volatility and Winpmem to scan the memory of a running Windows system (currently supporting Windows XP to Windows 8 both 32 and 64 bit and Windows 8.1 32bit).
+Detekt is a Python tool that relies on Yara to scan the memory of a running Windows system (currently supporting Windows XP to Windows 8.1 both 32 and 64bit).
 
 Detekt tries to detect the presence of pre-defined patterns that have been identified through the course of our research to be unique identifiers that indicate the presence of a given malware running on the computer. Currently it is provided with patterns for:
 
@@ -25,6 +25,7 @@ When compiling the tool on Windows systems, you'll have to install some requirem
 
 - Python 2.7
 - Yara 3.x
+- Psutil
 - PyQt4
 - PyWin32
 
@@ -39,15 +40,12 @@ Once all requirements are installed on your Windows environment, make sure you c
 
     $ git clone --recursive https://github.com/botherder/detekt.git
 
-This will clone also the Volatility and PyInstaller trunks. Copy the whole directory in your Windows environment and launch the ``make.bat`` script, which should successfully generate the final executable.
+This will clone also the PyInstaller trunk. Copy the whole directory in your Windows environment and launch the ``make.bat`` script, which should successfully generate the final executable.
 
 Known Issues
 ------------
 
-Performance is the main issue with Detekt, and it will need to be improved.
 Some Yara signatures need to be improved, as currently some of them are not able to detect all existing variants of the respective malware families.
-
-Windows 8.1 64bit is currently not supported because the tool appears to be unable to complete the execution and just goes on forever. This issue needs to be investigated and resolved as soon as possible.
 
 Signature
 ---------
