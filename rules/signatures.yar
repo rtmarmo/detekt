@@ -1,8 +1,2 @@
-//include "blackshades.yar"
-//include "darkcomet.yar"
-//include "xtreme.yar"
 include "rcs.yar"
 include "finfisher.yar"
-//include "njrat.yar"
-//include "shadowtech.yar"
-//include "gh0st.yar"

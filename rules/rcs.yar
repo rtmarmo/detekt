@@ -4,6 +4,11 @@ rule RCS_Scout
         detection = "Hacking Team RCS Scout"
 
     strings:
+        $filter1 = "$engine5"
+        $filter2 = "$start4"
+        $filter3 = "$upd2"
+        $filter4 = "$lookma6"
+
         $engine1 = /(E)ngine started/ wide ascii
         $engine2 = /(R)unning in background/ wide ascii
         $engine3 = /(L)ocking doors/ wide ascii
@@ -26,7 +31,7 @@ rule RCS_Scout
         $lookma6 = /(L)ook ma, no thread id\! \\\\o\// wide        
 
     condition:
-        all of ($engine*) or all of ($start*) or all of ($upd*) or 4 of ($lookma*)
+        (all of ($engine*) or all of ($start*) or all of ($upd*) or 4 of ($lookma*)) and not any of ($filter*)
 }
 
 rule RCS_Backdoor
@@ -35,6 +40,10 @@ rule RCS_Backdoor
         detection = "Hacking Team RCS Backdoor"
 
     strings:
+        $filter1 = "$debug3"
+        $filter2 = "$log2"
+        $filter3 = "error2"
+
         $debug1 = /\- (C)hecking components/ wide ascii
         $debug2 = /\- (A)ctivating hiding system/ wide ascii
         $debug3 = /(f)ully operational/ wide ascii
@@ -50,5 +59,5 @@ rule RCS_Backdoor
         $error2 = /\[The system is already monitored\]/ wide ascii
 
     condition:
-        2 of ($debug*) or 2 of ($log*) or all of ($error*)
+        (2 of ($debug*) or 2 of ($log*) or all of ($error*)) and not any of ($filter*)
 }
