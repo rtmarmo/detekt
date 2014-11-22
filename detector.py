@@ -36,18 +36,6 @@ log.addHandler(fh)
 log.addHandler(sh)
 log.setLevel(logging.DEBUG)
 
-process_whitelist = [
-    'avp.exe',
-    'avguard.exe',
-    'avira.oe.systr',
-    'savservice.exe',
-    'sbamsvc.exe',
-    'housecall.bin',
-    'avastui.exe',
-    'dphostw.exe',
-    'ekrn.exe',
-]
-
 def get_address_space(service_path, profile, yara_path):
     log.info("Obtaining address space and generating config for volatility")
 
@@ -97,14 +85,6 @@ def scan(service_path, profile_name, queue_results):
             process_name = process.ImageFileName
         except:
             process_name = ''
-
-        # If there is a process name, let's match it against the whitelist
-        # and skip if there is a match.
-        # TODO: this is hacky, need to find a better solution to false positives
-        # especially with security software.
-        if process_name:
-            if process_name.lower() in process_whitelist:
-                continue
 
         try:
             try:

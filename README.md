@@ -5,14 +5,8 @@ Detekt is a Python tool that relies on Yara, Volatility and Winpmem to scan the 
 
 Detekt tries to detect the presence of pre-defined patterns that have been identified through the course of our research to be unique identifiers that indicate the presence of a given malware running on the computer. Currently it is provided with patterns for:
 
-- DarkComet RAT
-- XtremeRAT
-- BlackShades RAT
-- njRAT
 - FinFisher FinSpy
 - HackingTeam RCS
-- ShadowTech RAT
-- Gh0st RAT
 
 Beware that it is possible that Detekt may not successfully detect the most recent versions of those malware families. Indeed, some of them will likely be updated in response to this release in order to remove or change the patterns that we identified. In addition, there may be existing versions of malware, from these families or from other providers, which are not detected by this tool. If Detekt does not find anything, this unfortunately cannot be considered a clean bill of health.
 

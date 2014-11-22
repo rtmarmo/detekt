@@ -75,8 +75,10 @@
             % else:
                 % if infected:
                     <div class="alert alert-danger">
-                        <h4>DANGER!</h4>
-                        <strong>I managed to identify the potential presence of some spyware!</strong> You should turn off this computer, never connect it again to the Internet or any external device and seek assistance.<br /><br />
+                        <h4>WARNING!</h4>
+                        <p><strong>I managed to identify the potential presence of some spyware!</strong>
+                        <p>There are possibilities of false positives, so please get in contact with us to verify the results and send us the file <b>detekt.log</b> the tool generated.</p>
+                        <p>If the infection is confirmed, you should turn off this computer, never connect it again to the Internet or any external device and seek assistance.</p>
                         You can find additional instructions on what to do next and on how to get in contact with us at <b>https://www.resistsurveillance.org/emergency</b>
                     </div>
 
@@ -114,9 +116,11 @@
                     </ul>
                 % else:
                     <div class="alert alert-success">
-                        <h4>Looks good.</h4>
-                        I wasn't able to identify the presence of any obvious spyware. Please note that this does not necessarily mean your computer is clean. If you have strong suspicion of being targeted, please do seek assistance.<br /><br />
-                        You can find additional instructions at <b>https://www.resistsurveillance.org/emergency</b>
+                        <h4>Nothing found.</h4>
+                        <p>I wasn't able to identify the presence of any of any governmental spyware of interest. Please note that this does not necessarily mean your computer is clean, as you could be targeted with many other viruses Detekt does NOT scan for. Executing regular scans with commercial Antivirus software, will help you identify more common threat viruses.</p>
+                        <p>Make sure you always have all your software updated to the most recent version and that your Antivirus and any additional security software is updated and running. The best defense is using the computer with conscience and maintaning a regular digital hygiene.</p>
+                        <p>If you have strong suspicion of being targeted despite this result, please do seek assistance.</p>
+                        You can find additional instructions on what to do next and on how to get in contact with us at <b>https://www.resistsurveillance.org/emergency</b>
                     </div>
                 % end
             % end
