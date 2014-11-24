@@ -43,7 +43,7 @@ rule FinSpy
 
         $skyperec1 = /\[%19s\] %25s\:    %s/ wide ascii
         $skyperec2 = /Global\\\{A48F1A32\-A340\-11D0\-BC6B\-00A0C903%\.04X\}/ wide
-        $skyperec3 = /(1411|1421|1431|1451)[0-9A-F]{8}\.dat/ wide ascii
+        //$skyperec3 = /(1411|1421|1431|1451)[0-9A-F]{8}\.dat/ wide ascii
 
         $mouserec1 = /(m)sc183Q000\.dat/ wide ascii
         $mouserec2 = /2201[0-9A-F]{8}\.dat/ wide ascii
