@@ -15,7 +15,7 @@ volatility = Tree(os.path.join('volatility', 'volatility'),
 
 exe = EXE(pyz,
           a.scripts,
-          a.binaries,
+          a.binaries + [('msvcr100.dll', 'C:\\WINDOWS\\system32\\msvcr100.dll', 'BINARY')],
           a.zipfiles,
           a.datas,
           volatility,
