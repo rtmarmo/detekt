@@ -61,7 +61,7 @@
                             % if error == 'NOT_AN_ADMIN':
                                 <li>Vous devez exécuter l'application en tant qu'Administrateur!</li>
                             % elif error == 'UNSUPPORTED_WINDOWS':
-                                <li>Votre version de Microsoft Windows n'est pas supportée.</li>
+                                <li>Cette version de Microsoft Windows n'est pas supportée.</li>
                             % elif error == 'NO_DRIVER':
                                 <li>Pas de pilote adéquat trouvé.</li>
                             % elif error == 'SERVICE_NO_START':
@@ -78,38 +78,37 @@
                         <h4>ATTENTION!</h4>
                         <p><strong>J'ai pu identifier la présence potentielle de logiciels espions (spyware)!</strong>
                         <p>Il est possible qu'il s'agisse de faux positifs, veuillez prendre contact avec nous pour vérifier les résultats et nous envoyer le fichier <b>detekt.log</b> généré par le programme.</p>
-                        <!-- todo : reprendre ici! -->
-                        <p>If the infection is confirmed, you should turn off this computer, never connect it again to the Internet or any external device and seek assistance.</p>
-                        You can find additional instructions on what to do next and on how to get in contact with us at <b>https://www.resistsurveillance.org/emergency</b>
+                        <p>Si l'infection est confirmée, vous devriez éteindre cet ordinateur, ne plus le connecter à Internet ou à tout autre périphérique externe, et demander de l'assistance.</p>
+                        Vous pouvez trouver des instructions supplémentaires concernant les opérations à mener et la manière de nous contacter à <b>https://www.resistsurveillance.org/emergency</b>
                     </div>
 
-                    <p>Following is what I discovered:</p>
+                    <p>Ci-après ce que j'ai découvert :</p>
                     <ul>
                         % for detection in results:
                             <li><strong>{{detection}}</strong><br />
                             % if detection == 'BlackShades RAT':
-                                This is a common trojan which is free to download from the Internet and available to just about anyone. It should be normally detected and quarantined by major AntiVirus software. Although it is impossible to guess who might be targeting you, you should seek for assistance nevertheless.
+                                C'est un cheval de Troie courant, librement téléchargeable depuis l'Internet et accessible à tout le monde. Il devrait normalement être détecté et mis en quarantaine par les logiciels antivirus principaux. Bien qu'il soit impossible de déduire qui vous cible, vous devriez néanmoins chercher de l'aide.
                             
                             % elif detection == 'DarkComet RAT':
-                                This is a common trojan which is free to download from the Internet and available to just about anyone. It should be normally detected and quarantined by major AntiVirus software. Although it is impossible to guess who might be targeting you, you should seek for assistance nevertheless.
+                                C'est un cheval de Troie courant, librement téléchargeable depuis l'Internet et accessible à tout le monde. Il devrait normalement être détecté et mis en quarantaine par les logiciels antivirus principaux. Bien qu'il soit impossible de déduire qui vous cible, vous devriez néanmoins chercher de l'aide.
 
                             % elif detection == 'FinFisher FinSpy':
-                                This is a very sophisticated backdoor produced by a German company and sold to government agencies worldwide. You might be targeted by yours or a foreign government. You should be really careful in your next steps in order to not further jeopardize your situation.
+                                C'est une porte dérobée très sophistiquée, produite par une entreprise allemande et vendue à des agences gouvernementales du monde entier. Vous pouvez être ciblé par votre gouvernement, ou un gouvernement étranger. Vous devriez être vraiment prudent dans vos prochaines actions afin de ne pas empirer votre situation.
 
                             % elif detection == 'Gh0st':
-                                This is a common trojan which is free to download from the Internet and available to just about anyone. It should be normally detected and quarantined by major AntiVirus software. Although it is impossible to guess who might be targeting you, you should seek for assistance nevertheless.
+                                C'est un cheval de Troie courant, librement téléchargeable depuis l'Internet et accessible à tout le monde. Il devrait normalement être détecté et mis en quarantaine par les logiciels antivirus principaux. Bien qu'il soit impossible de déduire qui vous cible, vous devriez néanmoins chercher de l'aide.
 
                             % elif detection == 'Njrat':
-                                This is a common trojan which is free to download from the Internet and available to just about anyone. It should be normally detected and quarantined by major AntiVirus software. Although it is impossible to guess who might be targeting you, you should seek for assistance nevertheless.
+                                C'est un cheval de Troie courant, librement téléchargeable depuis l'Internet et accessible à tout le monde. Il devrait normalement être détecté et mis en quarantaine par les logiciels antivirus principaux. Bien qu'il soit impossible de déduire qui vous cible, vous devriez néanmoins chercher de l'aide.
 
                             % elif detection == 'Hacking Team RCS Scout' or detection == 'Hacking Team RCS Backdoor':
-                                This is a very sophisticated backdoor produced by an Italian company and sold to government agencies worldwide. You might be targeted by yours or a foreign government. You should be really careful in your next steps in order to not further jeopardize your situation.
+                                C'est une porte dérobée très sophistiquée, produite par une entreprise allemande et vendue à des agences gouvernementales du monde entier. Vous pouvez être ciblé par votre gouvernement, ou un gouvernement étranger. Vous devriez être vraiment prudent dans vos prochaines actions afin de ne pas empirer votre situation.
 
                             % elif detection == 'ShadowTech RAT':
-                                This is a common trojan which is free to download from the Internet and available to just about anyone. It should be normally detected and quarantined by major AntiVirus software. Although it is impossible to guess who might be targeting you, you should seek for assistance nevertheless.
+                                C'est un cheval de Troie courant, librement téléchargeable depuis l'Internet et accessible à tout le monde. Il devrait normalement être détecté et mis en quarantaine par les logiciels antivirus principaux. Bien qu'il soit impossible de déduire qui vous cible, vous devriez néanmoins chercher de l'aide.
 
                             % elif detection == 'Xtreme RAT':
-                                This is a common trojan which is free to download from the Internet and available to just about anyone. It should be normally detected and quarantined by major AntiVirus software. Although it is impossible to guess who might be targeting you, you should seek for assistance nevertheless.
+                                C'est un cheval de Troie courant, librement téléchargeable depuis l'Internet et accessible à tout le monde. Il devrait normalement être détecté et mis en quarantaine par les logiciels antivirus principaux. Bien qu'il soit impossible de déduire qui vous cible, vous devriez néanmoins chercher de l'aide.
 
                             % end
                             </li>
@@ -117,11 +116,11 @@
                     </ul>
                 % else:
                     <div class="alert alert-success">
-                        <h4>Nothing found.</h4>
-                        <p>I wasn't able to identify the presence of any of any governmental spyware of interest. Please note that this does not necessarily mean your computer is clean, as you could be targeted with many other viruses Detekt does NOT scan for. Executing regular scans with commercial Antivirus software, will help you identify more common threat viruses.</p>
-                        <p>Make sure you always have all your software updated to the most recent version and that your Antivirus and any additional security software is updated and running. The best defense is using the computer with conscience and maintaning a regular digital hygiene.</p>
-                        <p>If you have strong suspicion of being targeted despite this result, please do seek assistance.</p>
-                        You can find additional instructions on what to do next and on how to get in contact with us at <b>https://www.resistsurveillance.org/emergency</b>
+                        <h4>Rien trouvé.</h4>
+                        <p>Je n'ai pu identifier la présence d'aucun logiciel espion gouvernemental notable. Notez que cela ne signifie pas nécessairement que votre ordinateur est propre, et que vous pouvez être la cible de beaucoup d'autres virus non recherchés par Detekt. Analyser régulièrement votre ordinateur à l'aide d'antivirus commerciaux vous aidera à identifier les menaces les plus courantes.</p>
+                        <p>Assurez-vous de toujours maintenir vos logiciels à jour des versions les plus récentes et de conserver votre antivirus et vos logiciels de sécurité à jour et en fonctionnement. La meilleure défense est d'utiliser l'ordinateur avec intelligence et de maintenir une bonne hygiène numérique.</p>
+                        <p>Si vous soupçonnez fortement d'être infecté en dépit de ce résultat, veuillez chercher de l'aide.</p>
+                        Vous pouvez trouver des instructions supplémentaires concernant les opérations à mener et la manière de nous contacter à <b>https://www.resistsurveillance.org/emergency</b>
                     </div>
                 % end
             % end
