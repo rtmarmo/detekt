@@ -18,16 +18,16 @@
             % include('languages.html', language=language)
 
             % if connection:
-                <div class="alert alert-warning"><strong>ATTENTION!</strong> You appear to be connected to the Internet. You should disconnect from any cable or wireless network during this test.</div>
+                <div class="alert alert-warning"><strong>ATTENTION!</strong> Il semble que vous soyez connecté à Internet. Vous devriez vous déconnecter de tout réseau filaire ou sans-fil pendant ce test.</div>
             % end
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><strong>What is this?</strong></h3>
+                    <h3 class="panel-title"><strong>Qu'est-ce que c'est?</strong></h3>
                 </div>
                 <div class="panel-body">
-                    This is a simple tool that tries to identify potential spyware infections on your computer.
-                    When launched, it will try to look for certain indicators in memory. If you have any running applications (such as Skype, the browser, etc.) please close them in order to increase performance and decrease chances of false positives. The execution will take a few minutes, so please be patient.
+                    C'est un outil simple qui tente d'identifier d'éventuelles infections de votre ordinateur par des logiciels espions.
+                    Lorsqu'il est exécuté, il tente de détecter certains indices en mémoire. Si vous avez des applications ouvertes (comme Skype, le navigateur internet, etc.) veuillez les fermer pour augmenter les performances et diminuer les possibilités de faux positifs. L'exécution va prendre quelques minutes, merci d'être patient.
                 </div>
             </div>
 
@@ -39,14 +39,14 @@
         % if action == 'running':
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><strong>Scanning...</strong></h3>
+                    <h3 class="panel-title"><strong>Analyse en cours...</strong></h3>
                 </div>
                 <div class="panel-body">
-                    <p>The scanning is in progress. It might take several minutes, please be patient and do not interrupt the application before it has naturally finished.
+                    <p>L'analyse est en cours. Cela peut prendre plusieurs minutes, veuillez patienter et patienter jusqu'à ce que l'application se termine d'elle même.
                     <div class="progress progress-striped active">
                         <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
                     </div>
-                    <p style="text-align: center;"><a href="/check">Refresh</a><br /><small>Should refresh automatically every 5 seconds</small></p>
+                    <p style="text-align: center;"><a href="/check">Rafraîchir</a><br /><small>Cela devrait se rafraîchir automatiquement toutes les 5 secondes</small></p>
                 </div>
             </div>
         % end
@@ -54,20 +54,20 @@
         % if action == 'results':
             % if errors:
                 <div class="alert alert-warning">
-                    <h4>WARNING!</h4>
-                    Some <strong>errors occurred</strong> that might have affected the outcome of the scan:
+                    <h4>ATTENTION!</h4>
+                    Des <strong>erreurs ont eu lieu</strong> qui peuvent avoir affecté le résultat de l'analyse :
                     <ul>
                         % for error in errors:
                             % if error == 'NOT_AN_ADMIN':
-                                <li>You need to run the application as an Administrator!</li>
+                                <li>Vous devez exécuter l'application en tant qu'Administrateur!</li>
                             % elif error == 'UNSUPPORTED_WINDOWS':
-                                <li>You are running an unsupported version of Microsoft Windows.</li>
+                                <li>Votre version de Microsoft Windows n'est pas supportée.</li>
                             % elif error == 'NO_DRIVER':
-                                <li>Can't find a suitable driver to be used.</li>
+                                <li>Pas de pilote adéquat trouvé.</li>
                             % elif error == 'SERVICE_NO_START':
-                                <li>Can't start the service, try to restart the application or the computer if that didn't help.</li>
+                                <li>Pas moyen de démarrer le service, essayez de redémarrer l'application ou l'ordinateur si ça n'a pas fonctionné.</li>
                             % elif error == 'SCAN_FAILED':
-                                <li>The scanning failed, try reinstalling the tool. If that doesn't help, provide the log file to your point of contact to investigate the issue.</li>
+                                <li>L'analyse a échoué, essayez de réinstaller l'application. Si ça ne fonctionne pas, fournissez le fichier journal à votre contact pour analyse du problème.</li>
                             % end
                         % end
                     </ul>
@@ -75,9 +75,10 @@
             % else:
                 % if infected:
                     <div class="alert alert-danger">
-                        <h4>WARNING!</h4>
-                        <p><strong>I managed to identify the potential presence of some spyware!</strong>
-                        <p>There are possibilities of false positives, so please get in contact with us to verify the results and send us the file <b>detekt.log</b> the tool generated.</p>
+                        <h4>ATTENTION!</h4>
+                        <p><strong>J'ai pu identifier la présence potentielle de logiciels espions (spyware)!</strong>
+                        <p>Il est possible qu'il s'agisse de faux positifs, veuillez prendre contact avec nous pour vérifier les résultats et nous envoyer le fichier <b>detekt.log</b> généré par le programme.</p>
+                        <!-- todo : reprendre ici! -->
                         <p>If the infection is confirmed, you should turn off this computer, never connect it again to the Internet or any external device and seek assistance.</p>
                         You can find additional instructions on what to do next and on how to get in contact with us at <b>https://www.resistsurveillance.org/emergency</b>
                     </div>
